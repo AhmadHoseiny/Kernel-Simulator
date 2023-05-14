@@ -4,13 +4,15 @@ public class MemoryWord {
     private String key;
     private Object val;
 
-    public MemoryWord(){}
+    public MemoryWord() {
+    }
+
     public MemoryWord(String key, Object val) {
         this.key = key;
         this.val = val;
     }
 
-    public String toString(){
+    public String toString() {
         return key + ": " + val;
     }
 
@@ -18,13 +20,14 @@ public class MemoryWord {
         return key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public Object getVal() {
         return val;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
     public void setVal(Object val) {
         this.val = val;
     }

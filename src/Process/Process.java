@@ -1,4 +1,5 @@
 package Process;
+
 import Memory.MemoryWord;
 import PCB.PCB;
 
@@ -11,18 +12,18 @@ public class Process {
     private PCB pcb;
     private int blockInMemory; //either 0 or 1  [0 --> P_a, 1 --> P_b], -1--> on disk not allocated in memory
 
-    private MemoryWord[]  variables = new MemoryWord[3];
-    public Process()
-    {
+    private MemoryWord[] variables = new MemoryWord[3];
+
+    public Process() {
 
     }
 
-    public Process(int arrivalTime, String programFileName){
+    public Process(int arrivalTime, String programFileName) {
         this.processID = id++;
         this.arrivalTime = arrivalTime;
         this.programFileName = programFileName;
         this.blockInMemory = -1;
-        this.pcb= new PCB (this.processID,ProcessState.NEW,0,-1,-1);
+        this.pcb = new PCB(this.processID, ProcessState.NEW, 0, -1, -1);
     }
 
     public int getProcessID() {

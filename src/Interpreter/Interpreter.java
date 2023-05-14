@@ -1,18 +1,21 @@
 package Interpreter;
-import Kernel_Controller.KernelController;
+
 import Memory.Memory;
 import Memory.MemoryWord;
 import Process.Process;
+
+import java.io.IOException;
+
 public class Interpreter {
 
-    public static void interpretAndRoute(Process p, String instruction){
+    public static void interpretAndRoute(Process p, String instruction) throws IOException {
         String[] instructionParts = instruction.split(" ");
         String instructionType = instructionParts[0];
         String instructionOperand = instructionParts[1];
         String instructionOperand2;
         int blockInMemory = p.getBlockInMemory();
-        int startUserProcess = (blockInMemory==0)? 10:25;
-        switch (instructionType){
+        int startUserProcess = (blockInMemory == 0) ? 10 : 25;
+        switch (instructionType) {
             case "print":
                 String toBePrinted = getVariableValue(p, instructionOperand);
                 Executer.print(toBePrinted);
@@ -21,18 +24,17 @@ public class Interpreter {
                 String str = instructionParts[2]; //either "input" or "readFile"
                 int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
                 Memory.getMemoryInstance().getMemoryWord(variableIndex).setKey(instructionOperand);
-                if(str.equals("readFile")){
+                if (str.equals("readFile")) {
                     String fileName = instructionParts[3];
                     String fileContent = Executer.readFile(fileName);
                     Memory.getMemoryInstance().getMemoryWord(variableIndex).setVal(fileContent);
-                }
-                else{ //input
+                } else { //input
                     String input = Executer.readInput();
                     Memory.getMemoryInstance().getMemoryWord(variableIndex).setVal(str);
                 }
                 break;
             case "writeFile":
-                instructionOperand2= instructionParts[2];
+                instructionOperand2 = instructionParts[2];
                 String toBeWritten = getVariableValue(p, instructionOperand2);
                 Executer.writeFile(instructionOperand, toBeWritten);
                 break;
@@ -53,34 +55,37 @@ public class Interpreter {
                 System.out.println("Invalid Instruction");
         }
     }
-    public static String getVariableValue(Process p, String variableName){
+
+    public static String getVariableValue(Process p, String variableName) {
         int blockInMemory = p.getBlockInMemory();
-        int startUserProcess = (blockInMemory==0)? 10:25;
-        for(int i=0; i < 3 ; i++){
+        int startUserProcess = (blockInMemory == 0) ? 10 : 25;
+        for (int i = 0; i < 3; i++) {
             MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
-            if(mw.getKey().equals(variableName)){
-                return (String)mw.getVal();
+            if (mw.getKey().equals(variableName)) {
+                return (String) mw.getVal();
             }
         }
         return null; //supposedly unreachable case
     }
-    public static int getVariableIndex(Process p, String variableName){
+
+    public static int getVariableIndex(Process p, String variableName) {
         int blockInMemory = p.getBlockInMemory();
-        int startUserProcess = (blockInMemory==0)? 10:25;
-        for(int i=0; i < 3 ; i++){
+        int startUserProcess = (blockInMemory == 0) ? 10 : 25;
+        for (int i = 0; i < 3; i++) {
             MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
-            if(mw.getKey().equals(variableName)){
+            if (mw.getKey().equals(variableName)) {
                 return i;
             }
         }
         return -1; //supposedly unreachable case (variable not found)
     }
-    public static int getFirstEmptyVariableIndex(Process p){
+
+    public static int getFirstEmptyVariableIndex(Process p) {
         int blockInMemory = p.getBlockInMemory();
-        int startUserProcess = (blockInMemory==0)? 10:25;
-        for(int i=0; i < 3 ; i++){
+        int startUserProcess = (blockInMemory == 0) ? 10 : 25;
+        for (int i = 0; i < 3; i++) {
             MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
-            if(mw == null){
+            if (mw == null) {
                 return i;
             }
         }

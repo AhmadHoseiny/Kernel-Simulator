@@ -1,21 +1,19 @@
 package Memory;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import File_Readers.ProgramFileReader;
 import Kernel_Controller.KernelController;
 import Process.Process;
 import Process.ProcessState;
-import PCB.PCB;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Memory {
     private static final int memoryCapacity = 40;
+    private static final Memory memoryInstance = new Memory();
     private MemoryWord[] memory;
     private boolean hasSpace[]; //true = available, false = not_available
-
-
-    private static final Memory memoryInstance = new Memory();
 
     private Memory() {
         this.hasSpace = new boolean[2];
@@ -74,38 +72,39 @@ public class Memory {
 
     public void swapOut(Process processToBeSwappedIn) throws FileNotFoundException {
         Process processToBeSwappedOut = new Process();
-        int indexSwappedOut =-1;
+        int indexSwappedOut = -1;
         // get process info of the one to be swapped out
         if (memory[3].getKey().equals("Process State") && memory[3].getVal() != ProcessState.RUNNING) {
-            indexSwappedOut=0;
+            indexSwappedOut = 0;
             processToBeSwappedOut = this.getFromPoolOfProcesses((int) memory[2].getVal());
 
         } else if (memory[8].getKey().equals("Process State") && memory[8].getVal() != ProcessState.RUNNING) {
-            indexSwappedOut=1;
+            indexSwappedOut = 1;
             processToBeSwappedOut = this.getFromPoolOfProcesses((int) memory[7].getVal());
         }
         processToBeSwappedOut.setBlockInMemory(-1);
         processToBeSwappedOut.getPcb().setPcbStartBoundary(-1);
         processToBeSwappedOut.getPcb().setUserProcessStartBoundary(-1);
-        processToBeSwappedOut.getPcb().setProgramCounter( (indexSwappedOut==0)?(int)memory[4].getVal():(int)memory[9].getVal());
-        int startVariableindex=-1;
+        processToBeSwappedOut.getPcb().setProgramCounter((indexSwappedOut == 0) ? (int) memory[4].getVal() : (int) memory[9].getVal());
+        int startVariableindex = -1;
 
-        switch(indexSwappedOut)
-        {
-            case 0: startVariableindex=10; break;
-            case 1: startVariableindex=25;break;
+        switch (indexSwappedOut) {
+            case 0:
+                startVariableindex = 10;
+                break;
+            case 1:
+                startVariableindex = 25;
+                break;
         }
-        for(int i =0;i<3;i++)
-        {
-            processToBeSwappedOut.getVariables()[i].setKey(memory[startVariableindex+i].getKey());
-            processToBeSwappedOut.getVariables()[i].setVal(memory[startVariableindex+i].getVal());
+        for (int i = 0; i < 3; i++) {
+            processToBeSwappedOut.getVariables()[i].setKey(memory[startVariableindex + i].getKey());
+            processToBeSwappedOut.getVariables()[i].setVal(memory[startVariableindex + i].getVal());
 
         }
-        cleanPcbPartInMemory((indexSwappedOut==0)?0:5);
+        cleanPcbPartInMemory((indexSwappedOut == 0) ? 0 : 5);
         cleanUserPartInMemory(startVariableindex);
-        hasSpace[indexSwappedOut]=true;
+        hasSpace[indexSwappedOut] = true;
         this.addProcess(processToBeSwappedIn);
-
 
 
         // making block memoy of swapped out to be -1
@@ -128,25 +127,21 @@ public class Memory {
             }
 
         }
-        return null ; // should never be the case though
+        return null; // should never be the case though
     }
 
 
-public void cleanPcbPartInMemory(int start )
-    {
-        for(int i=0;i<5;i++)
-        {
-            memory[start + i]=new MemoryWord();
+    public void cleanPcbPartInMemory(int start) {
+        for (int i = 0; i < 5; i++) {
+            memory[start + i] = new MemoryWord();
 
         }
     }
 
 
-    public void cleanUserPartInMemory(int start )
-    {
-        for(int i=0;i<15;i++)
-        {
-            memory[start + i]=new MemoryWord();
+    public void cleanUserPartInMemory(int start) {
+        for (int i = 0; i < 15; i++) {
+            memory[start + i] = new MemoryWord();
 
         }
     }
