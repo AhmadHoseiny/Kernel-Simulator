@@ -3,6 +3,8 @@ package Memory;
 public class MemoryWord {
     private String key;
     private Object val;
+
+    public MemoryWord(){}
     public MemoryWord(String key, Object val) {
         this.key = key;
         this.val = val;
@@ -20,4 +22,10 @@ public class MemoryWord {
         return val;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+    public void setVal(Object val) {
+        this.val = val;
+    }
 }

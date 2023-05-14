@@ -5,14 +5,15 @@ public class Process {
     private int processID;
     private int arrivalTime;
     private String programFileName;
-    private int startIndexInMemory;
+    private int blockInMemory; //either 0 or 1  [0 --> P_a, 1 --> P_b]
 
     public Process(int arrivalTime, String programFileName){
         this.processID = id++;
         this.arrivalTime = arrivalTime;
         this.programFileName = programFileName;
-        this.startIndexInMemory = -1;
+        this.blockInMemory = -1;
     }
+
     public int getProcessID() {
         return processID;
     }
@@ -25,11 +26,11 @@ public class Process {
         return programFileName;
     }
 
-    public int getStartIndexInMemory() {
-        return startIndexInMemory;
+    public int getBlockInMemory() {
+        return blockInMemory;
     }
 
-    public void setStartIndexInMemory(int startIndexInMemory) {
-        this.startIndexInMemory = startIndexInMemory;
+    public void setBlockInMemory(int blockInMemory) {
+        this.blockInMemory = blockInMemory;
     }
 }

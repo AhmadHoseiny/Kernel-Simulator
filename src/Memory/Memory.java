@@ -8,10 +8,9 @@ import File_Readers.ProgramFileReader;
 import Process.Process;
 import Process.ProcessState;
 public class Memory {
-    private MemoryWord[] memory;
     private static final int memoryCapacity = 40;
+    private MemoryWord[] memory;
     private boolean hasSpace[]; //true = available, false = not_available
-    private Process toBeSwappedOut; //the first one in
 
 
 
@@ -21,7 +20,6 @@ public class Memory {
         this.hasSpace = new boolean[2];
         Arrays.fill(this.hasSpace, true);
         this.memory = new MemoryWord[memoryCapacity];
-        this.toBeSwappedOut = null;
     }
     public static Memory getMemoryInstance() {
         return memoryInstance;
@@ -46,22 +44,27 @@ public class Memory {
 
         }
         hasSpace[blockIndex] = false;
-        int start = (blockIndex==0)? 0:20;
-        p.setStartIndexInMemory(start);
-        memory[start++] = new MemoryWord("Boundaries", start +" to " + (start+19));
-        memory[start++] = new MemoryWord("Process ID", p.getProcessID());
-        memory[start++] = new MemoryWord("Process State", ProcessState.NEW);
-        memory[start++] = new MemoryWord("Program Counter", 0);
-        memory[start++] = null; //var 1
-        memory[start++] = null; //var 2
-        memory[start++] = null; //var 3
+        p.setBlockInMemory(blockIndex);
+        int startPCB = (blockIndex==0)? 0:5;
+        int startUserProcess = (blockIndex==0)? 10:25;
+
+        memory[startPCB] = new MemoryWord("PCB Boundaries", startPCB +" to " + (startPCB+4));
+        startPCB++;
+        memory[startPCB++] = new MemoryWord("User Process Boundaries",
+                startUserProcess +" to " + (startUserProcess+14));
+        memory[startPCB++] = new MemoryWord("Process ID", p.getProcessID());
+        memory[startPCB++] = new MemoryWord("Process State", ProcessState.NEW);
+        memory[startPCB++] = new MemoryWord("Program Counter", 0);
+
+        memory[startUserProcess++] = new MemoryWord(); //var 1
+        memory[startUserProcess++] = null; //var 2
+        memory[startUserProcess++] = null; //var 3
         ArrayList<String> instructions = ProgramFileReader.readProgramFile(p.getProgramFileName());
         for(int i = 0; i < instructions.size(); i++){
-            memory[start++] = new MemoryWord("Instruction", instructions.get(i));
+            memory[startUserProcess++] = new MemoryWord("Instruction", instructions.get(i));
         }
+   }
+    public MemoryWord getMemoryWord(int index){
+        return memory[index];
     }
-//    public void removeProcess(int index){
-//        hasSpace[index] = true;
-//        memory[index] = null;
-//    }
 }
