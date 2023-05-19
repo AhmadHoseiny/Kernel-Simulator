@@ -1,7 +1,8 @@
-package Interpreter;
+package interpreter;
 
-import Memory.Memory;
-import Memory.MemoryWord;
+import executer.CPUExecuter;
+import memory.Memory;
+import memory.MemoryWord;
 import Process.Process;
 
 import java.io.IOException;
@@ -11,84 +12,74 @@ public class Interpreter {
     public static void interpretAndRoute(Process p, String instruction) throws IOException {
         String[] instructionParts = instruction.split(" ");
         String instructionType = instructionParts[0];
-        String instructionOperand = instructionParts[1];
+        String instructionOperand1 = instructionParts[1];
         String instructionOperand2;
         int blockInMemory = p.getBlockInMemory();
         int startUserProcess = (blockInMemory == 0) ? 10 : 25;
         switch (instructionType) {
             case "print":
-                String toBePrinted = getVariableValue(p, instructionOperand);
-                Executer.print(toBePrinted);
+                String toBePrinted = getVariableValue(p, instructionOperand1);
+                CPUExecuter.print(toBePrinted);
                 break;
             case "assign":
                 String str = instructionParts[2]; //either "input" or "readFile"
                 int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
-                Memory.getMemoryInstance().getMemoryWord(variableIndex).setKey(instructionOperand);
+                Memory.getMemoryInstance().getMemory()[variableIndex].setKey(instructionOperand1);
                 if (str.equals("readFile")) {
-                    String fileName = instructionParts[3];
-                    String fileContent = Executer.readFile(fileName);
-                    Memory.getMemoryInstance().getMemoryWord(variableIndex).setVal(fileContent);
+                    String fileName = getVariableValue(p, instructionParts[3]);
+                    String fileContent = CPUExecuter.readFile(fileName);
+                    Memory.getMemoryInstance().getMemory()[variableIndex].setVal(fileContent);
                 } else { //input
-                    String input = Executer.readInput();
-                    Memory.getMemoryInstance().getMemoryWord(variableIndex).setVal(str);
+                    String strInp = CPUExecuter.readInput();
+                    Memory.getMemoryInstance().getMemory()[variableIndex].setVal(strInp);
                 }
                 break;
             case "writeFile":
                 instructionOperand2 = instructionParts[2];
+                String fileName = getVariableValue(p, instructionOperand1);
                 String toBeWritten = getVariableValue(p, instructionOperand2);
-                Executer.writeFile(instructionOperand, toBeWritten);
+                CPUExecuter.writeFile(fileName, toBeWritten);
                 break;
             case "printFromTo":
                 instructionOperand2 = instructionParts[2];
-                int start = Integer.parseInt(getVariableValue(p, instructionOperand));
+                int start = Integer.parseInt(getVariableValue(p, instructionOperand1));
                 int end = Integer.parseInt(getVariableValue(p, instructionOperand2));
-                Executer.printFromTo(start, end);
-                System.out.println("OUT " + instructionOperand);
+                CPUExecuter.printFromTo(start, end);
                 break;
             case "semWait":
-                Executer.semWait(p, instructionOperand);
+                CPUExecuter.semWait(p, instructionOperand1);
                 break;
             case "semSignal":
-                Executer.semSignal(p, instructionOperand);
+                CPUExecuter.semSignal(p, instructionOperand1);
                 break;
             default:
                 System.out.println("Invalid Instruction");
         }
     }
 
+
     public static String getVariableValue(Process p, String variableName) {
         int blockInMemory = p.getBlockInMemory();
         int startUserProcess = (blockInMemory == 0) ? 10 : 25;
         for (int i = 0; i < 3; i++) {
-            MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
+            MemoryWord mw = Memory.getMemoryInstance().getMemory()[startUserProcess+i];
             if (mw.getKey().equals(variableName)) {
-                return (String) mw.getVal();
+                return mw.getVal();
             }
         }
         return null; //supposedly unreachable case
-    }
-
-    public static int getVariableIndex(Process p, String variableName) {
-        int blockInMemory = p.getBlockInMemory();
-        int startUserProcess = (blockInMemory == 0) ? 10 : 25;
-        for (int i = 0; i < 3; i++) {
-            MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
-            if (mw.getKey().equals(variableName)) {
-                return i;
-            }
-        }
-        return -1; //supposedly unreachable case (variable not found)
     }
 
     public static int getFirstEmptyVariableIndex(Process p) {
         int blockInMemory = p.getBlockInMemory();
         int startUserProcess = (blockInMemory == 0) ? 10 : 25;
         for (int i = 0; i < 3; i++) {
-            MemoryWord mw = Memory.getMemoryInstance().getMemoryWord(i);
-            if (mw == null) {
+            MemoryWord mw = Memory.getMemoryInstance().getMemory()[startUserProcess+i];
+            if (mw.getKey()==null && mw.getVal()==null) {
                 return i;
             }
         }
-        return -1; //supposedly unreachable case (no space found)
+        return (int)-1e9; //supposedly unreachable case (no space found)
     }
 }
+

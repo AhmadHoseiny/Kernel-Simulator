@@ -1,4 +1,4 @@
-package Mutex;
+package mutex;
 
 import Process.Process;
 
@@ -38,9 +38,13 @@ public class Mutex {
                 this.ownerID = nextProcess.getProcessID();
                 this.mutex = false;
                 return nextProcess; //the process to be added to ready queue
+                                    // and removed from general blocked queue
             }
         }
         return null; //no process to be added back to ready queue
     }
 
+    public Integer getOwnerID() {
+        return ownerID;
+    }
 }

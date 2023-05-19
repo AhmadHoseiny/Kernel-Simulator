@@ -1,7 +1,8 @@
-package Interpreter;
+package executer;
 
 import Process.Process;
-import Scheduler.Scheduler;
+import kernel_controller.KernelController;
+import scheduler.Scheduler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,18 +10,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class Executer {
+public class CPUExecuter {
 
     public static void print(String toBePrinted) {
         System.out.println(toBePrinted);
     }
 
     public static void writeFile(String fileName, String toBeWritten) throws IOException {
-        //TODO
-        /*
-            1- create a file with the name fileName
-            2- write toBeWritten to the file
-         */
 
         File fileToBeWritten = new File(fileName);
         FileWriter writer = new FileWriter(fileToBeWritten);
@@ -33,7 +29,6 @@ public class Executer {
 
         Scanner sc = new Scanner(new File(fileName));
         StringBuilder sb = new StringBuilder();
-        sb.append("");
         while (sc.hasNextLine()) {
             sb.append(sc.nextLine());
             sb.append("\n");
@@ -58,50 +53,43 @@ public class Executer {
     }
 
     public static void semWait(Process p, String resourceName) {
-        //TODO
-        /*
-            1- get mutex corresponding to resourceName
-            2- call its semWait()
-            3- add the process to the  generalBlockedQueue if blocked
-         */
+        KernelController kc = KernelController.getKernelControllerInstance();
+        Scheduler sch = Scheduler.getSchedulerInstance();
         switch (resourceName) {
             case "userInput" -> {
-                if (!Scheduler.getUserInputInstance().semWait(p))
-                    Scheduler.getSchedulerInstance().getGeneralBlockedQueue().add(p);
+                if (!sch.getUserInputInstance().semWait(p))
+                    kc.blockProcess(p);
             }
             case "userOutput" -> {
-                if (!Scheduler.getUserOutputInstance().semWait(p))
-                    Scheduler.getSchedulerInstance().getGeneralBlockedQueue().add(p);
+                if (!sch.getUserOutputInstance().semWait(p))
+                    kc.blockProcess(p);
             }
             case "file" -> {
-                if (!Scheduler.getFileInstance().semWait(p))
-                    Scheduler.getSchedulerInstance().getGeneralBlockedQueue().add(p);
+                if (!sch.getFileInstance().semWait(p))
+                    kc.blockProcess(p);
             }
             default -> System.out.println("Wrong Resource Name!!");
         }
     }
 
     public static void semSignal(Process p, String resourceName) {
-        //TODO
-        /*
-            1- get mutex corresponding to resourceName
-            2- call its semSignal()
-            3- add the process to the ready queue
-         */
+        KernelController kc = KernelController.getKernelControllerInstance();
+        Scheduler sch = Scheduler.getSchedulerInstance();
+        Process newP = null;
         switch (resourceName) {
             case "userInput" -> {
-                if (Scheduler.getUserInputInstance().semSignal(p) != null)
-                    Scheduler.getSchedulerInstance().getReadyQueue().add(p);
+                newP = sch.getUserInputInstance().semSignal(p);
             }
             case "userOutput" -> {
-                if (Scheduler.getUserOutputInstance().semSignal(p) != null)
-                    Scheduler.getSchedulerInstance().getReadyQueue().add(p);
+                newP = sch.getUserOutputInstance().semSignal(p);
             }
             case "file" -> {
-                if (Scheduler.getFileInstance().semSignal(p) != null)
-                    Scheduler.getSchedulerInstance().getReadyQueue().add(p);
+                newP = sch.getFileInstance().semSignal(p);
             }
             default -> System.out.println("Wrong Resource Name!!");
         }
+        if(newP != null)
+            kc.unblockProcess(newP);
     }
+
 }

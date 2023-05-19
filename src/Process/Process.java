@@ -1,29 +1,31 @@
 package Process;
 
-import Memory.MemoryWord;
-import PCB.PCB;
+import kernel_controller.KernelController;
+import memory.Memory;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class Process {
     static int id = 1;
+
     private int processID;
     private int arrivalTime;
-    private String programFileName;
 
-    private PCB pcb;
     private int blockInMemory; //either 0 or 1  [0 --> P_a, 1 --> P_b], -1--> on disk not allocated in memory
 
-    private MemoryWord[] variables = new MemoryWord[3];
-
+    private String programFileName;
     public Process() {
 
     }
 
-    public Process(int arrivalTime, String programFileName) {
+    //used for creating the process for the first time
+    public Process(int arrivalTime, String programFileName) throws IOException {
         this.processID = id++;
         this.arrivalTime = arrivalTime;
-        this.programFileName = programFileName;
         this.blockInMemory = -1;
-        this.pcb = new PCB(this.processID, ProcessState.NEW, 0, -1, -1);
+        this.programFileName = programFileName;
+//        KernelController.getKernelControllerInstance().createProcess(this);
     }
 
     public int getProcessID() {
@@ -33,25 +35,34 @@ public class Process {
     public int getArrivalTime() {
         return arrivalTime;
     }
+    public int getBlockInMemory() {
+        return blockInMemory;
+    }
 
     public String getProgramFileName() {
         return programFileName;
-    }
-
-    public int getBlockInMemory() {
-        return blockInMemory;
     }
 
     public void setBlockInMemory(int blockInMemory) {
         this.blockInMemory = blockInMemory;
     }
 
-    public PCB getPcb() {
-        return this.pcb;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Process process = (Process) o;
+        return processID == process.processID;
     }
 
-    public MemoryWord[] getVariables() {
-        return variables;
+    @Override
+    public int hashCode() {
+        return Objects.hash(processID);
+    }
+
+    public String toString(){
+        return "Process_" + getProcessID();
     }
 }
 
