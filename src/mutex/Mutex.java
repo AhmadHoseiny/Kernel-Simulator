@@ -47,4 +47,9 @@ public class Mutex {
     public Integer getOwnerID() {
         return ownerID;
     }
+
+
+    public Queue<Process> getBlockedQueue() {
+        return blockedQueue;
+    }
 }

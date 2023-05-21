@@ -54,21 +54,24 @@ public class Scheduler {
 
         while(!toBeCreatedPQ.isEmpty() || !readyQueue.isEmpty() || runningProcess != null){
 
+            if(clk>0)
+                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
             System.out.println("clk: " + clk);
 
 //            System.out.println("toBeCreatedPQ: "+toBeCreatedPQ.toString());
-//            System.out.println("Ready Queue: "+readyQueue.toString());
-//            System.out.println("General Blocked Queue: "+generalBlockedQueue.toString());
-//            System.out.println(mem.toString());
+            printQueuesMemory();    //print queues and memory
+            for(int i=0 ; i<3 ; i++)
+                System.out.println();
 
             //long-term scheduler
-            if(!toBeCreatedPQ.isEmpty()){
-                Process p = toBeCreatedPQ.peek();
-                if(p.getArrivalTime()==clk){
-                    toBeCreatedPQ.poll();
-                    kc.createProcess(p);
-                    kc.addToReadyQueue(p);
-                }
+            while(!toBeCreatedPQ.isEmpty() && toBeCreatedPQ.peek().getArrivalTime()==clk){
+                                            //create processes that arrived at this clk (if any)
+                                            //and it's a loop because there might be more than one process that
+                                            //arrived at this clk
+                Process p = toBeCreatedPQ.poll();
+                kc.createProcess(p);
+                kc.addToReadyQueue(p);
             }
 
             //short-term scheduler
@@ -80,14 +83,14 @@ public class Scheduler {
                     }
                     mem.setProcessState(p.getBlockInMemory(),"RUNNING");
                     runningProcess = p;
-                    System.out.println("Running Process: "+runningProcess +"   " +
+                    System.out.println("Currently Executing: "+runningProcess+"   PC: " +
                             mem.getProcessPC(runningProcess.getBlockInMemory()));
                     kc.executeProcess(runningProcess);
                     runningTimeSoFar++;
                 }
             }
             else{
-                System.out.println("Running Process: "+runningProcess+"   " +
+                System.out.println("Currently Executing: "+runningProcess+"   PC: " +
                         mem.getProcessPC(runningProcess.getBlockInMemory()));
                 if(runningProcess.getBlockInMemory()==-1){ //was swapped out
                     kc.swapIn(runningProcess);
@@ -101,7 +104,6 @@ public class Scheduler {
             if(runningProcess != null && kc.checkIfProcessFinishedAndTerminateIfSo(runningProcess)){
                 runningProcess = null;
                 runningTimeSoFar = 0;
-                this.readyQueue.remove(runningProcess);
             }
 
             //Remove from CPU on blocking or timeout
@@ -122,10 +124,20 @@ public class Scheduler {
             clk++;
         }
 
-
+        //print final state after execution of all 3 processes
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Final State");
+        printQueuesMemory();    //print queues and memory
     }
 
-
+    public void printQueuesMemory(){
+        System.out.println("Ready Queue: "+readyQueue.toString());
+        System.out.println("General Blocked Queue: "+generalBlockedQueue.toString());
+        System.out.println("File Blocked Queue: "+fileInstance.getBlockedQueue().toString());
+        System.out.println("User Input Blocked Queue: "+userInputInstance.getBlockedQueue().toString());
+        System.out.println("User Output Blocked Queue: "+userOutputInstance.getBlockedQueue().toString());
+        System.out.println("Memory: \n" + Memory.getMemoryInstance().toString());
+    }
 
 
 

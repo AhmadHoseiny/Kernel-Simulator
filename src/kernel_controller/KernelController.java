@@ -202,11 +202,13 @@ public class KernelController {
     //returns true if process is finished
     public boolean checkIfProcessFinishedAndTerminateIfSo(Process p) throws IOException {
         Memory mem = Memory.getMemoryInstance();
+        Scheduler sch = Scheduler.getSchedulerInstance();
         int pc = mem.getProcessPC(p.getBlockInMemory());
         int userProcessStart = (p.getBlockInMemory() == 0) ? 10 : 25;
         MemoryWord instruction = mem.getMemory()[userProcessStart+3+pc];
         if (instruction == null) {
-            mem.clearMemory(p.getBlockInMemory());
+            mem.setProcessState(p.getBlockInMemory(), "FINISHED");
+            sch.getReadyQueue().remove(p);
             return true;
         }
         return false;

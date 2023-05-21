@@ -25,16 +25,19 @@ public class CPUExecuter {
 
     }
 
+
+    //we assume that the file exists and that it has exactly one line
     public static String readFile(String fileName) throws FileNotFoundException {
 
         Scanner sc = new Scanner(new File(fileName));
-        StringBuilder sb = new StringBuilder();
-        while (sc.hasNextLine()) {
-            sb.append(sc.nextLine());
-            sb.append("\n");
-        }
-
-        return sb.toString();
+        return sc.nextLine();
+//        StringBuilder sb = new StringBuilder();
+//        while (sc.hasNextLine()) {
+//            sb.append(sc.nextLine());
+//            sb.append("\n");
+//        }
+//
+//        return sb.toString();
     }
 
     public static String readInput() {

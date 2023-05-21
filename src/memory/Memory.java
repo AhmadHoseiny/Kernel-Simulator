@@ -76,17 +76,17 @@ public class Memory {
         memory[startPCB+3].setVal(newState);
     }
 
-    public void clearMemory(int blockIndex){
-        int startPCB = (blockIndex == 0) ? 0 : 5;
-        int startUserProcess = (blockIndex == 0) ? 10 : 25;
-        for (int i = startPCB; i < startPCB+5; i++) {
-            memory[i] = new MemoryWord();
-        }
-        for (int i = startUserProcess; i < startUserProcess+15; i++) {
-            memory[i] = new MemoryWord();
-        }
-        hasSpace[blockIndex] = true;
-    }
+//    public void clearMemory(int blockIndex){
+//        int startPCB = (blockIndex == 0) ? 0 : 5;
+//        int startUserProcess = (blockIndex == 0) ? 10 : 25;
+//        for (int i = startPCB; i < startPCB+5; i++) {
+//            memory[i] = new MemoryWord();
+//        }
+//        for (int i = startUserProcess; i < startUserProcess+15; i++) {
+//            memory[i] = new MemoryWord();
+//        }
+//        hasSpace[blockIndex] = true;
+//    }
 
 
     public MemoryWord[] getMemory() {
