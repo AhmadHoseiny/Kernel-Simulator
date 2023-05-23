@@ -17,7 +17,7 @@ public class Main {
 
 
 
-        int timeSlice = 2; //aka quantum
+        int timeSlice = 1; //aka quantum
 
         Process process1 = new Process(process1ArrivalTime, process1FileName);
         Process process2 = new Process(process2ArrivalTime, process2FileName);

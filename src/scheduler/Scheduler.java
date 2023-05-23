@@ -90,11 +90,11 @@ public class Scheduler {
                 }
             }
             else{
-                System.out.println("Currently Executing: "+runningProcess+"   PC: " +
-                        mem.getProcessPC(runningProcess.getBlockInMemory()));
                 if(runningProcess.getBlockInMemory()==-1){ //was swapped out
                     kc.swapIn(runningProcess);
                 }
+                System.out.println("Currently Executing: "+runningProcess+"   PC: " +
+                        mem.getProcessPC(runningProcess.getBlockInMemory()));
                 kc.executeProcess(runningProcess);
                 runningTimeSoFar++;
             }

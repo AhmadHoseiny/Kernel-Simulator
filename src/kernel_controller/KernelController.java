@@ -90,6 +90,7 @@ public class KernelController {
         File file = new File("Process_"+p.getProcessID() +"_Disk.txt");
         Scanner sc = new Scanner(file);
 
+
         mem.getMemory()[startPCB] = new MemoryWord("PCB Boundaries", sc.nextLine());
         startPCB++;
         mem.getMemory()[startPCB++] = new MemoryWord("User Process Boundaries", sc.nextLine());
@@ -118,7 +119,7 @@ public class KernelController {
         int blockToBeSwappedOut;
 
         // Only one process should be running at a time
-        if (!mem.getProcessState(3).equals("RUNNING")) {
+        if (!mem.getProcessState(0).equals("RUNNING")) {
             blockToBeSwappedOut = 0;
         } else{
             blockToBeSwappedOut = 1;
@@ -151,12 +152,14 @@ public class KernelController {
         while(i<3){ //variables
             fw.write(mem.getMemory()[startUserProcess+i].getKey() + "," +
                     mem.getMemory()[startUserProcess+i].getVal() + "\n");
+            mem.getMemory()[startUserProcess+i] = null;
             i++;
         }
         while(true){ //instructions
             if(mem.getMemory()[startUserProcess+i] == null)
                 break;
             fw.write(mem.getMemory()[startUserProcess+i].getVal()+"\n");
+            mem.getMemory()[startUserProcess+i] = null;
             i++;
         }
         fw.close();
