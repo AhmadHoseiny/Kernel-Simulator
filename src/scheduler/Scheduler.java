@@ -125,9 +125,6 @@ public class Scheduler {
                             kc.addToReadyQueue(p);
                         }
 
-
-
-
                         kc.addToReadyQueue(runningProcess);
                         runningProcess = null;
                         runningTimeSoFar = 0;

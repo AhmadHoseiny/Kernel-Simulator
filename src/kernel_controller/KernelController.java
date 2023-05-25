@@ -36,9 +36,11 @@ public class KernelController {
         switch(blockIndex) {
             case 0:
                 mem.setProcess_1(p);
+                mem.setProcessTmp(0,"EMPTY");
                 break;
             case 1:
                 mem.setProcess_2(p);
+                mem.setProcessTmp(1,"EMPTY");
                 break;
         }
 
@@ -74,6 +76,7 @@ public class KernelController {
             swapOut();
             blockIndex = mem.getEmptySpace();
         }
+
         System.out.println("******************************************");
         System.out.println("Process swapped in : "+ p.toString() );
         System.out.println("******************************************");
@@ -97,7 +100,9 @@ public class KernelController {
         Scanner sc = new Scanner(file);
 
        // writing tmp from disk to memory
+
         mem.setProcessTmp(blockIndex, sc.nextLine());
+
 
         mem.getMemory()[startPCB] = new MemoryWord("PCB Boundaries", sc.nextLine());
         startPCB++;
@@ -107,6 +112,8 @@ public class KernelController {
         mem.getMemory()[startPCB++] = new MemoryWord("Program Counter", sc.nextLine());
         for(int i=0 ; i<3 ; i++){
             String var[] = sc.nextLine().split(",");
+
+
             if(var[0].equals("null") && var[1].equals("null"))
                 mem.getMemory()[startUserProcess++] = new MemoryWord();
             else
@@ -145,7 +152,7 @@ public class KernelController {
             case 1:
                 processToBeSwappedOut = mem.getProcess_2();
                 mem.setProcess_2(null);
-                mem.setProcessTmp(0,"EMPTY");
+                mem.setProcessTmp(1,"EMPTY");
                 break;
         }
 
@@ -164,7 +171,9 @@ public class KernelController {
         File file = new File("Process_"+processID +"_Disk.txt");
         FileWriter fw = new FileWriter(file);
         // writing tmp to disk
-        fw.write(oldTmp);
+
+        fw.write(oldTmp + "\n");
+
         for(int i=0 ; i<5 ; i++){
             fw.write(mem.getMemory()[startPCB+i].getVal()+"\n");
             mem.getMemory()[startPCB+i] = null;
@@ -173,7 +182,7 @@ public class KernelController {
         while(i<3){ //variables
             fw.write(mem.getMemory()[startUserProcess+i].getKey() + "," +
                     mem.getMemory()[startUserProcess+i].getVal() + "\n");
-            mem.getMemory()[startUserProcess+i] = null;
+            mem.getMemory()[startUserProcess+i] = new MemoryWord();
             i++;
         }
         while(true){ //instructions
@@ -226,15 +235,26 @@ public class KernelController {
         System.out.println("##############################");
 
        boolean special =  checkIfSpecialInstruction(instruction);
-       if((special && mem.getProcessTmp(p.getBlockInMemory()).equals("DONE")) || ! special )
-            mem.incrementProcessPC(p.getBlockInMemory());
+
+
+      if(special && mem.getProcessTmp(p.getBlockInMemory()).equals("DONE"))
+      {
+          mem.setProcessTmp(p.getBlockInMemory(), "EMPTY");
+          mem.incrementProcessPC(p.getBlockInMemory());
+      }
+      else if (!special)
+      {
+          mem.incrementProcessPC(p.getBlockInMemory());
+      }
+
+
+
     }
 
     public boolean checkIfSpecialInstruction(String instruction )
     {
         String instructionParts[] = instruction.split(" ");
-        for(int i=0;i<instructionParts.length;i++)
-            System.out.println(instructionParts[i]);
+
         if(instructionParts[0].equals("assign") && ( instructionParts[2].equals("input") || instructionParts[2].equals("readFile")))
             return true ;
         return false;

@@ -6,6 +6,7 @@ import Process.Process;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -95,6 +96,11 @@ public class Memory {
             this.Process_2_tmp=newTmp;
 
     }
+
+
+
+
+
 
 //    public void clearMemory(int blockIndex){
 //        int startPCB = (blockIndex == 0) ? 0 : 5;

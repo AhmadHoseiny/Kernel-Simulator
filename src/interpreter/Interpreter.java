@@ -6,6 +6,7 @@ import memory.MemoryWord;
 import Process.Process;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 
 public class Interpreter {
 
@@ -23,8 +24,6 @@ public class Interpreter {
                 break;
             case "assign":
                 String str = instructionParts[2]; //either "input" or "readFile"
-                int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
-                Memory.getMemoryInstance().getMemory()[variableIndex].setKey(instructionOperand1);
                 if (str.equals("readFile")) {
                     if(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()).equals("EMPTY"))
                     {
@@ -34,8 +33,10 @@ public class Interpreter {
                     }
                     else
                     {
+                        int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
+                        Memory.getMemoryInstance().getMemory()[variableIndex].setKey(instructionOperand1);
                         Memory.getMemoryInstance().getMemory()[variableIndex].setVal(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()));
-                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE ");
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE");
                     }
 
 
@@ -46,11 +47,16 @@ public class Interpreter {
                         String strInp = CPUExecuter.readInput();
                         Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(),strInp);
 
+
+
                     }
                     else
                     {
+                        int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
+
+                        Memory.getMemoryInstance().getMemory()[variableIndex].setKey(instructionOperand1);
                         Memory.getMemoryInstance().getMemory()[variableIndex].setVal(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()));
-                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE ");
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE");
                     }
 
 
@@ -97,7 +103,8 @@ public class Interpreter {
         int startUserProcess = (blockInMemory == 0) ? 10 : 25;
         for (int i = 0; i < 3; i++) {
             MemoryWord mw = Memory.getMemoryInstance().getMemory()[startUserProcess+i];
-            if (mw.getKey()==null && mw.getVal()==null) {
+
+            if (mw.getKey()==null && mw.getVal()==null){
                 return i;
             }
         }
