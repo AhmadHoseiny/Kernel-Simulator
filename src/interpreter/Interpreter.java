@@ -26,12 +26,34 @@ public class Interpreter {
                 int variableIndex = getFirstEmptyVariableIndex(p) + startUserProcess;
                 Memory.getMemoryInstance().getMemory()[variableIndex].setKey(instructionOperand1);
                 if (str.equals("readFile")) {
-                    String fileName = getVariableValue(p, instructionParts[3]);
-                    String fileContent = CPUExecuter.readFile(fileName);
-                    Memory.getMemoryInstance().getMemory()[variableIndex].setVal(fileContent);
-                } else { //input
-                    String strInp = CPUExecuter.readInput();
-                    Memory.getMemoryInstance().getMemory()[variableIndex].setVal(strInp);
+                    if(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()).equals("EMPTY"))
+                    {
+                        String fileName = getVariableValue(p, instructionParts[3]);
+                        String fileContent = CPUExecuter.readFile(fileName);
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(),fileContent);
+                    }
+                    else
+                    {
+                        Memory.getMemoryInstance().getMemory()[variableIndex].setVal(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()));
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE ");
+                    }
+
+
+                } else {
+                    //input
+                    if(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()).equals("EMPTY"))
+                    {
+                        String strInp = CPUExecuter.readInput();
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(),strInp);
+
+                    }
+                    else
+                    {
+                        Memory.getMemoryInstance().getMemory()[variableIndex].setVal(Memory.getMemoryInstance().getProcessTmp(p.getBlockInMemory()));
+                        Memory.getMemoryInstance().setProcessTmp(p.getBlockInMemory(), "DONE ");
+                    }
+
+
                 }
                 break;
             case "writeFile":

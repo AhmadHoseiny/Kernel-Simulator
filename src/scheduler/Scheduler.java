@@ -59,7 +59,7 @@ public class Scheduler {
 
             System.out.println("clk: " + clk);
 
-//            System.out.println("toBeCreatedPQ: "+toBeCreatedPQ.toString());
+            System.out.println("toBeCreatedPQ: "+toBeCreatedPQ.toString());
             printQueuesMemory();    //print queues and memory
             for(int i=0 ; i<3 ; i++)
                 System.out.println();
@@ -114,6 +114,20 @@ public class Scheduler {
                 }
                 else {
                     if(runningTimeSoFar == timeSlice) {
+
+                        // I should add the newly arrived here
+                        while(!toBeCreatedPQ.isEmpty() && toBeCreatedPQ.peek().getArrivalTime()==clk+1){
+                            //create processes that arrived at this clk (if any)
+                            //and it's a loop because there might be more than one process that
+                            //arrived at this clk
+                            Process p = toBeCreatedPQ.poll();
+                            kc.createProcess(p);
+                            kc.addToReadyQueue(p);
+                        }
+
+
+
+
                         kc.addToReadyQueue(runningProcess);
                         runningProcess = null;
                         runningTimeSoFar = 0;

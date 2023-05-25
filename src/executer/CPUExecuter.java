@@ -50,7 +50,7 @@ public class CPUExecuter {
 
     public static void printFromTo(int start, int end) {
         for (int i = start; i <= end; i++) {
-            System.out.print(i + " ");
+           printSystemCall(i);
         }
         System.out.println();
     }
@@ -94,5 +94,10 @@ public class CPUExecuter {
         if(newP != null)
             kc.unblockProcess(newP);
     }
+    public static void printSystemCall(int i)
+    {
+        System.out.print(i + " ");
+    }
+
 
 }

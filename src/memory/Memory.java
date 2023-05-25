@@ -22,6 +22,8 @@ public class Memory {
         this.memory = new MemoryWord[memoryCapacity];
         this.Process_1 = new Process();
         this.Process_2 = new Process();
+        this.Process_1_tmp="EMPTY";
+        this.Process_2_tmp="EMPTY";
     }
 
     public static Memory getMemoryInstance() {
@@ -31,6 +33,11 @@ public class Memory {
 
     private Process Process_1;
     private Process Process_2;
+
+    private  String Process_1_tmp;
+
+    private String Process_2_tmp;
+
 
 
 
@@ -64,6 +71,10 @@ public class Memory {
         int startUserProcess = (blockIndex == 0) ? 10 : 25;
         return memory[startUserProcess+3+instructionOffset].getVal(); //3 = 3 variables
     }
+    public String getProcessTmp(int blockIndex)
+    {
+        return (blockIndex==0)? this.Process_1_tmp: this.Process_2_tmp;
+    }
 
     public void incrementProcessPC(int blockIndex){
         int startPCB = (blockIndex == 0) ? 0 : 5;
@@ -74,6 +85,15 @@ public class Memory {
     public void setProcessState(int blockIndex, String newState){
         int startPCB = (blockIndex == 0) ? 0 : 5;
         memory[startPCB+3].setVal(newState);
+    }
+    public void setProcessTmp(int blockIndex, String newTmp)
+    {
+
+        if(blockIndex==0)
+            this.Process_1_tmp=newTmp;
+        else
+            this.Process_2_tmp=newTmp;
+
     }
 
 //    public void clearMemory(int blockIndex){

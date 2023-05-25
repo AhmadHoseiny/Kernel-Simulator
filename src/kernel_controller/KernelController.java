@@ -10,6 +10,7 @@ import scheduler.Scheduler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -73,6 +74,11 @@ public class KernelController {
             swapOut();
             blockIndex = mem.getEmptySpace();
         }
+        System.out.println("******************************************");
+        System.out.println("Process swapped in : "+ p.toString() );
+        System.out.println("******************************************");
+
+
         mem.getHasSpace()[blockIndex] = false;
         p.setBlockInMemory(blockIndex);
         switch(blockIndex) {
@@ -90,6 +96,8 @@ public class KernelController {
         File file = new File("Process_"+p.getProcessID() +"_Disk.txt");
         Scanner sc = new Scanner(file);
 
+       // writing tmp from disk to memory
+        mem.setProcessTmp(blockIndex, sc.nextLine());
 
         mem.getMemory()[startPCB] = new MemoryWord("PCB Boundaries", sc.nextLine());
         startPCB++;
@@ -124,18 +132,29 @@ public class KernelController {
         } else{
             blockToBeSwappedOut = 1;
         }
+        String oldTmp = Memory.getMemoryInstance().getProcessTmp(blockToBeSwappedOut);
         mem.getHasSpace()[blockToBeSwappedOut] = true;
         Process processToBeSwappedOut = null;
+
         switch (blockToBeSwappedOut) {
             case 0:
                 processToBeSwappedOut = mem.getProcess_1();
                 mem.setProcess_1(null);
+                mem.setProcessTmp(0,"EMPTY");
                 break;
             case 1:
                 processToBeSwappedOut = mem.getProcess_2();
                 mem.setProcess_2(null);
+                mem.setProcessTmp(0,"EMPTY");
                 break;
         }
+
+        // printing id of wapped out process
+
+        System.out.println("******************************************");
+        System.out.println("Process swapped out : "+ processToBeSwappedOut.toString() );
+        System.out.println("******************************************");
+
         processToBeSwappedOut.setBlockInMemory(-1);
 
         int startPCB = (blockToBeSwappedOut == 0) ? 0 : 5;
@@ -144,6 +163,8 @@ public class KernelController {
         int processID = mem.getProcessId(blockToBeSwappedOut);
         File file = new File("Process_"+processID +"_Disk.txt");
         FileWriter fw = new FileWriter(file);
+        // writing tmp to disk
+        fw.write(oldTmp);
         for(int i=0 ; i<5 ; i++){
             fw.write(mem.getMemory()[startPCB+i].getVal()+"\n");
             mem.getMemory()[startPCB+i] = null;
@@ -199,8 +220,31 @@ public class KernelController {
         int pc = mem.getProcessPC(p.getBlockInMemory());
         String instruction = mem.getProcessInstruction(p.getBlockInMemory(), pc);
         Interpreter.interpretAndRoute(p, instruction);
-        mem.incrementProcessPC(p.getBlockInMemory());
+
+        System.out.println("##############################");
+        System.out.println("Instruction currently executing : " + instruction);
+        System.out.println("##############################");
+
+       boolean special =  checkIfSpecialInstruction(instruction);
+       if((special && mem.getProcessTmp(p.getBlockInMemory()).equals("DONE")) || ! special )
+            mem.incrementProcessPC(p.getBlockInMemory());
     }
+
+    public boolean checkIfSpecialInstruction(String instruction )
+    {
+        String instructionParts[] = instruction.split(" ");
+        for(int i=0;i<instructionParts.length;i++)
+            System.out.println(instructionParts[i]);
+        if(instructionParts[0].equals("assign") && ( instructionParts[2].equals("input") || instructionParts[2].equals("readFile")))
+            return true ;
+        return false;
+
+
+    }
+
+
+
+
 
     //returns true if process is finished
     public boolean checkIfProcessFinishedAndTerminateIfSo(Process p) throws IOException {
@@ -216,4 +260,9 @@ public class KernelController {
         }
         return false;
     }
+
+
+
+
+//
 }
